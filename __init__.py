@@ -128,7 +128,14 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         self.log.info("Perform a movie search? %s", movie_search)
         self.log.info("Perform a tv search? %s", tv_search)
         phrase = phrase.replace(" on ", "").replace("in ", "").strip()
-        playlist = Playlist()
+        playlist = Playlist(
+            skill_id=self.skill_id,
+            skill_icon=self.skill_icon,
+            media_type=media_type,
+            confidence=confidence,
+            title=phrase,
+            artist=phrase,
+        )
 
         # Music search
         if media_type in (MediaType.MUSIC, MediaType.AUDIO, MediaType.GENERIC) and (
