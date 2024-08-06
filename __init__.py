@@ -148,17 +148,21 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
-                playlist.append(res)
+                playlist.add_entry(res)
             # max_confidence = sorted([res.match_confidence for res in pl], reverse=True)
 
         # Movie search
-        if media_type in (
-            MediaType.MOVIE,
-            MediaType.SHORT_FILM,
-            MediaType.SILENT_MOVIE,
-            MediaType.VIDEO,
-            MediaType.DOCUMENTARY,
-            MediaType.GENERIC,
+        if (
+            media_type
+            in (
+                MediaType.MOVIE,
+                MediaType.SHORT_FILM,
+                MediaType.SILENT_MOVIE,
+                MediaType.VIDEO,
+                MediaType.DOCUMENTARY,
+                MediaType.GENERIC,
+            )
+            and movie_search
         ):
             self.log.info("Searching Plex Movies for %s", phrase)
             pl = self.plex_api.search_movies(phrase)
@@ -167,10 +171,13 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
-                playlist.append(res)
+                playlist.add_entry(res)
 
         # TV search
-        if media_type in (MediaType.TV, MediaType.CARTOON, MediaType.GENERIC):
+        if (
+            media_type in (MediaType.TV, MediaType.CARTOON, MediaType.GENERIC)
+            and tv_search
+        ):
             self.log.info("Searching Plex TV for %s", phrase)
             pl = self.plex_api.search_shows(phrase)
             for res in pl:
@@ -178,7 +185,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
-                playlist.append(res)
+                playlist.add_entry(res)
         self.log.debug(playlist.as_dict)
         self.log.debug(playlist.entries)
         yield playlist
