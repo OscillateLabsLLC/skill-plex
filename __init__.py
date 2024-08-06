@@ -179,4 +179,6 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                 )
                 res.skill_id = self.skill_id
                 playlist.append(res)
+        self.log.debug(playlist.as_dict)
+        self.log.debug(playlist.entries)
         yield playlist
