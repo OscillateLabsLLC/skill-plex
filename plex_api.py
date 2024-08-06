@@ -55,8 +55,7 @@ class PlexAPI:
             for result in results:
                 tracks = self._get_tracks_from_result(result)
                 track_list += [self._construct_track_dict(track) for track in tracks]
-        LOG.debug("Found %s tracks", len(track_list))
-        LOG.debug("Tracks: %s", [x.title for x in track_list])
+        LOG.debug("Found %s music tracks in Plex", len(track_list))
         return track_list
 
     def _get_tracks_from_result(self, result):
