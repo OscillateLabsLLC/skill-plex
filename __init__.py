@@ -114,7 +114,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         :returns: list of dict search results
         """
         # TODO: improved confidence calculation
-        confidence = 75
+        confidence = 85
         if self.voc_match(phrase, "plex"):
             confidence += 15
             phrase = self.remove_voc(phrase, "plex")
