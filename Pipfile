@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-ovos-workshop = "~=0.0.7"
+ovos-workshop = "~=0.0.16a48"
 plexapi = "~=4.13"
 
 [dev-packages]

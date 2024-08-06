@@ -20,12 +20,13 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from os.path import dirname, join
-from typing import List
+from typing import Optional
 
-from ovos_plugin_common_play import MediaType, PlaybackType
+from ovos_plugin_common_play import MediaType
 from ovos_utils import classproperty
 from ovos_utils.messagebus import Message
 from ovos_utils.process_utils import RuntimeRequirements
+from ovos_workshop.backwards_compat import Playlist
 from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill, ocp_search
 
 from .plex_api import PlexAPI
@@ -35,7 +36,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
     """Plex OCP Skill"""
 
     def __init__(self, *args, **kwargs):
-        super(PlexSkill, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.skill_icon = join(dirname(__file__), "ui", "plex.png")
         self._plex_api = None
         self.supported_media = [
@@ -50,7 +51,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
             MediaType.CARTOON,
             MediaType.TV,
         ]
-        self._plex_api = self.plex_api
+        self._plex_api: Optional[PlexAPI] = self.plex_api
 
     @classproperty
     def runtime_requirements(self):
@@ -100,10 +101,12 @@ class PlexSkill(OVOSCommonPlaybackSkill):
             self.settings["token"] = token
             self.settings.store()
         if not success:
-            self.log.error("Plex login failed, please set token manually in settings.json")
+            self.log.error(
+                "Plex login failed, please set token manually in settings.json"
+            )
 
     @ocp_search()
-    def search_plex(self, phrase, media_type=MediaType.GENERIC) -> List[dict]:
+    def search_plex(self, phrase, media_type=MediaType.GENERIC):
         """
         OCP Search handler to return results for a user request
         :param phrase: search phrase from user
@@ -125,6 +128,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         self.log.info("Perform a movie search? %s", movie_search)
         self.log.info("Perform a tv search? %s", tv_search)
         phrase = phrase.replace(" on ", "").replace("in ", "").strip()
+        playlist = Playlist()
 
         # Music search
         if media_type in (MediaType.MUSIC, MediaType.AUDIO, MediaType.GENERIC) and (
@@ -133,23 +137,12 @@ class PlexSkill(OVOSCommonPlaybackSkill):
             self.log.info("Searching Plex Music for %s", phrase)
             pl = self.plex_api.search_music(phrase)
             for res in pl:
-                res["media_type"] = media_type
-                res["playback"] = PlaybackType.AUDIO
-                if media_type != MediaType.GENERIC:
-                    confidence += 10
-                res["match_confidence"] = confidence
-                res["skill_id"] = self.skill_id
-            max_confidence = sorted([res["match_confidence"] for res in pl], reverse=True)
-            yield {
-                "media_type": MediaType.MUSIC,
-                "playback": PlaybackType.AUDIO,
-                "image": pl[0].get("image", "") if pl else "",
-                "skill_icon": self.skill_icon,
-                "bg_image": pl[0].get("bg_image", "") if pl else "",
-                "title": pl[0].get("title") if pl else "",
-                "playlist": pl,
-                "match_confidence": max(0, max_confidence[0] if max_confidence else 0),
-            }
+                res.match_confidence = (
+                    confidence if media_type == MediaType.GENERIC else confidence + 10
+                )
+                res.skill_id = self.skill_id
+                playlist.append(res)
+            # max_confidence = sorted([res.match_confidence for res in pl], reverse=True)
 
         # Movie search
         if media_type in (
@@ -163,43 +156,20 @@ class PlexSkill(OVOSCommonPlaybackSkill):
             self.log.info("Searching Plex Movies for %s", phrase)
             pl = self.plex_api.search_movies(phrase)
             for res in pl:
-                res["media_type"] = media_type
-                res["playback"] = PlaybackType.AUDIO
-                if media_type != MediaType.GENERIC:
-                    confidence += 10
-                res["match_confidence"] = confidence
-                res["skill_id"] = self.skill_id
-            max_confidence = sorted([res["match_confidence"] for res in pl], reverse=True)
-            yield {
-                "media_type": media_type,
-                "playback": PlaybackType.VIDEO,
-                "image": pl[0].get("image", "") if pl else "",
-                "skill_icon": self.skill_icon,
-                "bg_image": pl[0].get("bg_image", "") if pl else "",
-                "title": pl[0].get("title") if pl else "",
-                "playlist": pl,
-                "match_confidence": max(0, max_confidence[0] if max_confidence else 0),
-            }
+                res.match_confidence = (
+                    confidence if media_type == MediaType.GENERIC else confidence + 10
+                )
+                res.skill_id = self.skill_id
+                playlist.append(res)
 
         # TV search
         if media_type in (MediaType.TV, MediaType.CARTOON, MediaType.GENERIC):
             self.log.info("Searching Plex TV for %s", phrase)
             pl = self.plex_api.search_shows(phrase)
             for res in pl:
-                res["media_type"] = media_type
-                res["playback"] = PlaybackType.VIDEO
-                if media_type != MediaType.GENERIC:
-                    confidence += 10
-                res["match_confidence"] = confidence
-                res["skill_id"] = self.skill_id
-            max_confidence = sorted([res["match_confidence"] for res in pl], reverse=True)
-            yield {
-                "media_type": media_type,
-                "playback": PlaybackType.VIDEO,
-                "image": pl[0].get("image", "") if pl else "",
-                "skill_icon": self.skill_icon,
-                "bg_image": pl[0].get("bg_image", "") if pl else "",
-                "title": pl[0].get("title") if pl else "",
-                "playlist": pl,
-                "match_confidence": max(0, max_confidence[0] if max_confidence else 0),
-            }
+                res.match_confidence = (
+                    confidence if media_type == MediaType.GENERIC else confidence + 10
+                )
+                res.skill_id = self.skill_id
+                playlist.append(res)
+        yield playlist
