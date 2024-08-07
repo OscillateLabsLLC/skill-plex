@@ -12,25 +12,6 @@
         "Play Star Trek the Next Generation on Plex",
         "Play the tv show Star Trek the Next Generation on Plex"
     ],
-    "desktopFile": false,
-    "warning": "",
-    "systemDeps": false,
-    "requirements": {
-        "python": [
-            "plexapi~=4.13",
-            "ovos-workshop~=0.0.11"
-        ],
-        "system": {},
-        "skill": []
-    },
-    "incompatible_skills": [],
-    "platforms": [
-        "i386",
-        "x86_64",
-        "ia64",
-        "arm64",
-        "arm"
-    ],
     "branch": "master",
     "license": "BSD-3-Clause",
     "icon": "https://www.plex.tv/wp-content/themes/plex/assets/img/plex-logo.svg",
@@ -48,9 +29,10 @@
     ],
     "credits": [
         "NeonGeckoCom",
-        "NeonDaniel"
+        "NeonDaniel",
+        "mikejgray"
     ],
     "skillname": "skill-plex",
-    "authorname": "d-mcknight",
+    "authorname": "OscillateLabsLLC",
     "foldername": null
 }

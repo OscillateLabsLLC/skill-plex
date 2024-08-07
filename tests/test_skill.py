@@ -5,7 +5,6 @@ from os import mkdir
 from os.path import join, dirname, exists
 from unittest.mock import Mock
 from ovos_utils.messagebus import FakeBus
-
 from ovos_workshop.skill_launcher import SkillLoader
 
 bus = FakeBus()
@@ -15,7 +14,9 @@ class TestSkill(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         bus.run_in_thread()
-        skill_loader = SkillLoader(bus=bus, skill_directory=dirname(dirname(__file__)), skill_id="PlexSkill")
+        skill_loader = SkillLoader(
+            bus=bus, skill_directory=dirname(dirname(__file__)), skill_id="PlexSkill"
+        )
         # TODO: Mock the PlexAPI class to prevent network calls
         skill_loader.load()
         cls.skill = skill_loader.instance

@@ -86,6 +86,7 @@ class PlexAPI:
             for result in results:
                 if isinstance(result, Movie):
                     movie_list.append(self._construct_movie_dict(result))
+        LOG.debug("Found %s movies in Plex", len(movie_list))
         return movie_list
 
     def _construct_movie_dict(self, mov):
@@ -112,6 +113,7 @@ class PlexAPI:
             for result in results:
                 episodes = self._get_episodes_from_result(result)
                 show_list += [self._construct_show_dict(show) for show in episodes]
+        LOG.debug("Found %s TV shows in Plex", len(show_list))
         return show_list
 
     def _get_episodes_from_result(self, result):

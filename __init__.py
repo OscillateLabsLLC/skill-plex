@@ -68,6 +68,11 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         )
 
     @property
+    def base_confidence_score(self):
+        """The base confidence score for this skill. Too low and you won't get any results."""
+        return self.config.get("base_confidence_score") or 95
+
+    @property
     def plex_api(self) -> PlexAPI:
         """
         Instantiate PlexAPI class using the token from settings.json
@@ -114,9 +119,9 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         :returns: list of dict search results
         """
         # TODO: improved confidence calculation
-        confidence = 85
+        confidence = 95
         if self.voc_match(phrase, "plex"):
-            confidence += 15
+            confidence += 5
             phrase = self.remove_voc(phrase, "plex")
 
         # Determine what kind of media to play
@@ -127,7 +132,13 @@ class PlexSkill(OVOSCommonPlaybackSkill):
         self.log.info("Media type for search: %s", media_type)
         self.log.info("Perform a movie search? %s", movie_search)
         self.log.info("Perform a tv search? %s", tv_search)
-        phrase = phrase.replace(" on ", "").replace("in ", "").strip()
+        phrase = (
+            phrase.replace("plex", "")
+            .replace("plexx", "")
+            .replace(" on ", "")
+            .replace("in ", "")
+            .strip()
+        )
         playlist = Playlist(
             skill_id=self.skill_id,
             skill_icon=self.skill_icon,
@@ -148,8 +159,8 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
+                res.media_type = MediaType.MUSIC
                 playlist.add_entry(res)
-            # max_confidence = sorted([res.match_confidence for res in pl], reverse=True)
 
         # Movie search
         if (
@@ -171,6 +182,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
+                res.media_type = MediaType.MOVIE
                 playlist.add_entry(res)
 
         # TV search
@@ -185,7 +197,6 @@ class PlexSkill(OVOSCommonPlaybackSkill):
                     confidence if media_type == MediaType.GENERIC else confidence + 10
                 )
                 res.skill_id = self.skill_id
+                res.media_type = MediaType.TV
                 playlist.add_entry(res)
-        self.log.debug(playlist.as_dict)
-        self.log.debug(playlist.entries)
         yield playlist
