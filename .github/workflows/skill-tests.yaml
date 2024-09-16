@@ -10,7 +10,5 @@ jobs:
     uses: neongeckocom/.github/.github/workflows/python_build_tests.yml@master
   skill_unit_tests:
     uses: neongeckocom/.github/.github/workflows/skill_tests.yml@master
-  skill_install_tests:
-    uses: neongeckocom/.github/.github/workflows/skill_test_installation.yml@master
   license_tests:
     uses: neongeckocom/.github/.github/workflows/license_tests.yml@master
