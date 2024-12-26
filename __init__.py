@@ -36,7 +36,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
     """Plex OCP Skill"""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(bus=None, skill_id='', *args, **kwargs)
         self.skill_icon = join(dirname(__file__), "ui", "plex.png")
         self._plex_api = None
         self.supported_media = [
