@@ -70,7 +70,7 @@ class PlexSkill(OVOSCommonPlaybackSkill):
     @property
     def base_confidence_score(self):
         """The base confidence score for this skill. Too low and you won't get any results."""
-        return self.config.get("base_confidence_score") if self.config else 95 or 95
+        return self.settings.get("base_confidence_score") or 95
 
     @property
     def plex_api(self) -> PlexAPI:
