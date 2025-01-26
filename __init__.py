@@ -35,8 +35,8 @@ from .plex_api import PlexAPI
 class PlexSkill(OVOSCommonPlaybackSkill):
     """Plex OCP Skill"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(bus=None, skill_id='', *args, **kwargs)
+    def __init__(self, *args, bus=None, skill_id='', **kwargs):
+        super().__init__(*args, bus=bus, skill_id=skill_id, **kwargs)
         self.skill_icon = join(dirname(__file__), "ui", "plex.png")
         self._plex_api = None
         self.supported_media = [
@@ -51,6 +51,8 @@ class PlexSkill(OVOSCommonPlaybackSkill):
             MediaType.CARTOON,
             MediaType.TV,
         ]
+
+    def initialize(self):
         self._plex_api: Optional[PlexAPI] = self.plex_api
 
     @classproperty
